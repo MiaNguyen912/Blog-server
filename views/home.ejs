@@ -1,0 +1,20 @@
+<%- include("partials/header") -%>
+
+    <h1>Home</h1>
+    <p> <%=content%> </p>
+
+    
+    <% posts.forEach(function(post){ %> <!--parameter inside function is the singular version of array items-->
+                                        <!--posts is the array containing all composed posts from the user-->
+        <h1> <%= post.title %> </h1> <!--items in posts are objects with form {title: content}-->
+        <p> <%= post.content %> </p>
+    <% }); %>
+
+    <!-- this for loop is equal to the forEach method above -->
+    <!-- for(let i=0; i<posts.length; i++){ 
+        console.log(posts[i].title);    
+    } -->
+
+
+
+<%- include("partials/footer") -%>
