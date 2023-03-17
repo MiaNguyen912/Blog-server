@@ -51,11 +51,13 @@ app.post("/compose", function(req, res){
 })
 //----------------------------------
 
-app.get("/posts/:postName", function(req,res){  
-  const requestedTitle = req.params.postName;
+app.get("/posts/:postName", function(req,res){  //dynamic URL
+  const requestedTitle = _.lowerCase(req.params.postName); //lowerCase() is a function of lodash package, it will ignore space and uppercase
   posts.forEach(function(post){
-    if (_.lowerCase(post.title) === _.lowerCase(requestedTitle)){   //if there's a post with title "abc", then if we access localhost:3000/posts/abc, it'll print out "match found"
-      console.log("match found");                                   //lowerCase() is a function of lodash package
+    const storedTitle = _.lowerCase(post.title);
+    if (storedTitle === requestedTitle){   //if there's a post with title "abc", then we can access localhost:3000/posts/abc
+      //console.log("match found");                                   
+      res.render("post", {title: requestedTitle, content: post.content});   //render post.ejs
     }
   });
 });
