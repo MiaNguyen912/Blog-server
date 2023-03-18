@@ -13,10 +13,13 @@
     <% posts.forEach(function(post){ %> <!--parameter inside function is the singular version of array items-->
                                         <!--posts is the array containing all composed posts from the user-->
         <h1> <%= post.title %> </h1> <!--items in posts are objects with form {title: content}-->
-        <p> <%= truncatedContent(post.content, 100); %> </p>
+        <p> 
+            <%= truncatedContent(post.content, 100); %> 
+            <a href="/posts/ <%=post.title%>">Read More</a> 
+        </p>
 
-        <!-- we can also use the built-in substring function to truncate string  -->
-        <!-- <p> <%=post.content.substring(0,100) + "..." %> </p> -->
+        <!-- we can also use the built-in substring function to truncate string (remember to add ejs tag to the code below) -->
+        <!-- <p> post.content.substring(0,100) + "..." </p> -->
     <% }); %>
 
 <%- include("partials/footer") -%>
