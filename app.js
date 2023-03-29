@@ -4,6 +4,10 @@ const express = require("express");
 const bodyParser = require("body-parser"); //help us tap into each element of the body of user's request
 const ejs = require("ejs");
 const _ = require('lodash');
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/blogsDB'); 
+//------------------------
 
 const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
@@ -18,13 +22,25 @@ app.use(express.static("public"));  //let our server use the static folder "publ
 
 // -------------------------------------------
 
-var posts = []; //global variable
+
+const postSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+});
+const Post = mongoose.model("Post", postSchema); 
+
+//--------------------------------------------
+
+//var posts = []; //global variable, since we're using mongoDB database, we dont need an array to store data
 
 app.get("/", function(req, res){
-  res.render("home", {  //render "home.ejs" when user get to "/"
-    content: homeStartingContent, 
-    posts: posts
-  });  
+  Post.find().then((posts)=>{  //find all
+    res.render("home", {  //render "home.ejs" when user get to "/"
+      content: homeStartingContent, 
+      posts: posts //posts is the returned array
+    });  
+  })
+  
 })
 // --------------------------------
 
@@ -42,24 +58,31 @@ app.get("/compose", function(req, res){
   res.render("compose",{}) //render "conpose.ejs" when user get to "/compose"
 })
 app.post("/compose", function(req, res){
-  const post = { //object
+  const post = new Post({ //object
     title: req.body.postTitle,  
     content: req.body.postBody
-  };  
-  posts.push(post);
+  });  
+  post.save()
+  //posts.push(post);
   res.redirect("/");
 })
 //----------------------------------
 
 app.get("/posts/:postName", function(req,res){  //dynamic URL
   const requestedTitle = _.lowerCase(req.params.postName); //lowerCase() is a function of lodash package, it will ignore space and uppercase
-  posts.forEach(function(post){
-    const storedTitle = _.lowerCase(post.title);
-    if (storedTitle === requestedTitle){   //if there's a post with title "abc", then we can access localhost:3000/posts/abc
-      //console.log("match found");                                   
-      res.render("post", {title: requestedTitle, content: post.content});   //render post.ejs
-    }
-  });
+  // const requestedPostId = req.params.postId;
+
+  Post.findOne({title: requestedTitle}).then((post)=>{
+    res.render("post", {title: post.title, content: post.content});   //render post.ejs
+
+  })
+  // posts.forEach(function(post){
+  //   const storedTitle = _.lowerCase(post.title);
+  //   if (storedTitle === requestedTitle){   //if there's a post with title "abc", then we can access localhost:3000/posts/abc
+  //     //console.log("match found");                                   
+  //     res.render("post", {title: requestedTitle, content: post.content});   //render post.ejs
+  //   }
+  // });
 });
 
 
