@@ -71,6 +71,9 @@ app.post("/compose", function(req, res){
 app.get("/posts/:postName", function(req,res){  //dynamic URL
   const requestedTitle = _.lowerCase(req.params.postName); //lowerCase() is a function of lodash package, it will ignore space and uppercase
   // const requestedPostId = req.params.postId;
+  //post.findById(_id: requestedPostId).then((post)=>{
+  //   res.render("post", {title: post.title, content: post.content}); 
+  // })
 
   Post.findOne({title: requestedTitle}).then((post)=>{
     res.render("post", {title: post.title, content: post.content});   //render post.ejs
